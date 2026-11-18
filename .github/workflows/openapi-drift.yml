@@ -1,0 +1,38 @@
+name: API drift
+
+# Fails while the SDK's copy of the Developer API document (openapi/developer-openapi.json) differs
+# from the one the dev API serves: the API changed, and the SDK hasn't caught up. Fix it with
+#   yarn openapi:pull <url> && yarn generate
+# then update types, resources, tests and README, and add a changeset (CLAUDE.md).
+
+on:
+  schedule:
+    - cron: '0 7 * * *' # every morning, Lagos time
+  workflow_dispatch:
+  pull_request:
+    paths: ['openapi/**', 'src/generated/**']
+
+jobs:
+  drift:
+    name: SDK matches the deployed API
+    runs-on: ubuntu-latest
+    env:
+      SOURCE: ${{ vars.PICKRIDERS_OPENAPI_URL || 'https://pickriders-api-dev.onrender.com/developer/docs/openapi.json' }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: yarn
+      - run: yarn install --frozen-lockfile
+      - name: Pull the deployed document and regenerate
+        run: yarn openapi:pull "$SOURCE" && yarn generate && yarn format > /dev/null
+      - name: Compare
+        run: |
+          if git diff --quiet -- openapi src/generated; then
+            echo "The SDK matches $SOURCE."
+          else
+            git diff --stat -- openapi src/generated
+            echo "::error::The Developer API changed and the SDK hasn't caught up. Run: yarn openapi:pull $SOURCE && yarn generate, then update the SDK (CLAUDE.md)."
+            exit 1
+          fi
