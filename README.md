@@ -302,4 +302,4 @@ Node.js 20 or later, Bun, Deno, or any runtime with `fetch` and Web Crypto. `pic
 
 ## Contributing
 
-See [CONTRIBUTING.md](./CONTRIBUTING.md). Report security issues privately through [GitHub security advisories](https://github.com/Pickriders/pickriders-node/security/advisories/new), not in public issues.
+See [CONTRIBUTING.md](./CONTRIBUTING.md). Report security issues privately through [GitHub security advisories](https://github.com/Pickriders/pickriders-node-sdk/security/advisories/new), not in public issues.

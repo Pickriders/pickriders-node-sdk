@@ -17,7 +17,7 @@ describe.skipIf(!key)('sandbox quickstart', () => {
   it('books a delivery and follows it to the door', { timeout: 90_000 }, async () => {
     const pickriders = new Pickriders(key, { serviceArea: 'NG-LA' });
 
-    await expect(pickriders.ping()).resolves.toMatchObject({ object: 'ping', livemode: false });
+    await expect(pickriders.account.retrieve()).resolves.toMatchObject({ object: 'account' });
 
     const order = await pickriders.orders.create({
       pickup: {
