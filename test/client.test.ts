@@ -73,7 +73,7 @@ describe('new Pickriders()', () => {
 
   it('uses PICKRIDERS_BASE_URL, for staging', async () => {
     vi.stubEnv('PICKRIDERS_BASE_URL', 'https://staging.test/developer/api/v1');
-    const api = mockApi().on('GET', '/ping', () => ({ object: 'ping', livemode: false }));
+    const api = mockApi().on('GET', '/ping', () => ({ object: 'ping', ok: true }));
     await new Pickriders(TEST_KEY, { fetch: api.fetch }).ping();
     expect(api.calls[0]!.url.origin).toBe('https://staging.test');
   });

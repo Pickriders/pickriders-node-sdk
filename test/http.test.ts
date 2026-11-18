@@ -21,9 +21,9 @@ const client = (api: ReturnType<typeof mockApi>, options = {}) =>
 
 describe('requests', () => {
   it('sends the key, JSON and a User-Agent, and parses the answer', async () => {
-    const api = mockApi().on('GET', '/ping', () => ({ object: 'ping', livemode: false }));
+    const api = mockApi().on('GET', '/ping', () => ({ object: 'ping', ok: true }));
 
-    await expect(client(api).ping()).resolves.toEqual({ object: 'ping', livemode: false });
+    await expect(client(api).ping()).resolves.toEqual({ object: 'ping', ok: true });
 
     const [call] = api.calls;
     expect(call!.url.toString()).toBe('https://api.test/developer/api/v1/ping');

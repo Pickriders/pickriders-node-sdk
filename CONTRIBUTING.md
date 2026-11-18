@@ -3,7 +3,7 @@
 ## Set up
 
 ```sh
-nvm use          # Node 22 (the SDK supports 20+)
+nvm use          # Node 22: the dev tools need 22+, the SDK itself supports 20+
 yarn install     # also installs the pre-commit hook
 yarn test:watch  # tests re-run as you edit
 ```
@@ -57,3 +57,15 @@ CI runs it when the `PICKRIDERS_TEST_KEY` secret is set.
 - **Field names are the API's.** Requests and responses stay snake_case, exactly as in the docs and webhooks.
 - **Never move an order backwards.** Anything that updates an order goes through the order store.
 - **Errors say what to do next.** Every message a developer can hit should name the fix.
+
+## Node versions
+
+The SDK supports Node 20+, but the dev tools need Node 22+. So CI runs the full checks on Node 22 and 24, and on Node 20, 22 and 24 installs the packed build into an empty project and runs `test/compat/built-package.test.mjs` with `node --test`. To run that yourself:
+
+```sh
+yarn build && npm pack
+mkdir /tmp/app && cd /tmp/app && npm init -y && npm i <path to pickriders-x.y.z.tgz>
+cp <repo>/test/compat/built-package.test.mjs . && node --test built-package.test.mjs
+```
+
+Pull requests into `dev` and `main` can only merge once the **CI passed** check succeeds.
