@@ -131,8 +131,8 @@ export class Pickriders {
     this.statusResource = new StatusResource(this.http);
   }
 
-  /** Checks the key works. Resolves with `{ object: 'ping', livemode }`. */
-  ping(options?: RequestOptions): Promise<{ object: 'ping'; livemode: boolean }> {
+  /** Checks the API is reachable. Needs no valid key: use `account.retrieve()` to check the key. */
+  ping(options?: RequestOptions): Promise<{ object: 'ping'; ok: boolean }> {
     return this.http.request('GET', 'ping', options);
   }
 

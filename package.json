@@ -14,11 +14,11 @@
     "sdk",
     "webhooks"
   ],
-  "homepage": "https://github.com/Pickriders/pickriders-node#readme",
-  "bugs": "https://github.com/Pickriders/pickriders-node/issues",
+  "homepage": "https://github.com/Pickriders/pickriders-node-sdk#readme",
+  "bugs": "https://github.com/Pickriders/pickriders-node-sdk/issues",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Pickriders/pickriders-node.git"
+    "url": "git+https://github.com/Pickriders/pickriders-node-sdk.git"
   },
   "license": "MIT",
   "author": "Pickriders",
