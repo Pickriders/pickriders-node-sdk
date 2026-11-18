@@ -1,0 +1,49 @@
+name: CI
+
+on:
+  push:
+    branches: [main, dev]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    name: Node ${{ matrix.node }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        node: [20, 22, 24]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+          cache: yarn
+      - run: yarn install --frozen-lockfile
+      - run: yarn typecheck
+      - run: yarn lint
+      - run: yarn format:check
+      - run: yarn test
+      - run: yarn check:package
+
+  sandbox:
+    name: Sandbox quickstart
+    runs-on: ubuntu-latest
+    needs: check
+    if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository
+    env:
+      PICKRIDERS_TEST_KEY: ${{ secrets.PICKRIDERS_TEST_KEY }}
+      PICKRIDERS_BASE_URL: ${{ vars.PICKRIDERS_BASE_URL }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: yarn
+      - run: yarn install --frozen-lockfile
+      - name: Run the quickstart against the sandbox (skipped without PICKRIDERS_TEST_KEY)
+        run: yarn test:sandbox
