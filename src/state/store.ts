@@ -2,7 +2,8 @@ import type { Unsubscribe } from './emitter';
 
 /**
  * A value you can read, replace and watch. Its `subscribe` and `getSnapshot` fit React's
- * useSyncExternalStore, Svelte stores and Vue's watch as they are: no adapter needed.
+ * useSyncExternalStore as they are. `subscribe` calls back on changes only, not at once, so a Svelte
+ * store wraps it in `readable` (the docs' Svelte guide shows how).
  */
 export interface Store<T> {
   /** The current value. The same object until it changes, so it's safe to compare by reference. */

@@ -1106,7 +1106,9 @@ export interface components {
              *       "cart_id": "c_981"
              *     }
              */
-            metadata?: Record<string, never>;
+            metadata?: {
+                [key: string]: string;
+            };
             /**
              * @description auto rings riders now (or at the scheduled time). manual waits for POST /orders/{id}/dispatch.
              * @default auto
@@ -1283,11 +1285,14 @@ export interface components {
             /** @description Your own id for the order, unique per mode. */
             reference: string | null;
             /**
+             * @description Your own keys and string values, as you set them on the order.
              * @example {
              *       "cart_id": "c_981"
              *     }
              */
-            metadata: Record<string, never>;
+            metadata: {
+                [key: string]: string;
+            };
             /** @example quo_6560f0c2a1b2c3d4e5f60718 */
             quote_id: string | null;
             /** @example NG-LA */
@@ -1608,8 +1613,12 @@ export interface components {
             object: string;
             /** @example evt_6560f0c2a1b2c3d4e5f60718 */
             id: string;
-            /** @example order.delivered */
-            type: string;
+            /**
+             * @description What happened. `ping` comes only from sending a test event to an endpoint.
+             * @example order.delivered
+             * @enum {string}
+             */
+            type: "order.created" | "order.searching" | "order.offer.created" | "order.offer.expired" | "order.rider_assigned" | "order.rider_changed" | "order.picked_up" | "order.stop.arrived" | "order.stop.completed" | "order.delivered" | "order.cancelled" | "order.failed" | "wallet.funded" | "wallet.balance_low" | "account.updated" | "ping";
             /** @example 2026-11-11T09:30:00.000Z */
             created: string;
             livemode: boolean;
@@ -1686,10 +1695,7 @@ export interface operations {
     developerRetrieveAccount: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description POST only. A unique value (e.g. a UUID) so a retry within 24 hours replays the first response. */
-                "Idempotency-Key"?: string;
-            };
+            header?: never;
             path?: never;
             cookie?: never;
         };
@@ -1708,10 +1714,7 @@ export interface operations {
     developerRetrieveWallet: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description POST only. A unique value (e.g. a UUID) so a retry within 24 hours replays the first response. */
-                "Idempotency-Key"?: string;
-            };
+            header?: never;
             path?: never;
             cookie?: never;
         };
@@ -1731,7 +1734,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description POST only. A unique value (e.g. a UUID) so a retry within 24 hours replays the first response. */
+                /** @description A unique value (e.g. a UUID) so a retry within 24 hours replays the first response. */
                 "Idempotency-Key"?: string;
             };
             path?: never;
@@ -1773,22 +1776,27 @@ export interface operations {
                 /** @description created[gte] and/or created[lte]: ISO 8601 dates or Unix seconds. */
                 created?: Record<string, never>;
             };
-            header?: {
-                /** @description POST only. A unique value (e.g. a UUID) so a retry within 24 hours replays the first response. */
-                "Idempotency-Key"?: string;
-            };
+            header?: never;
             path?: never;
             cookie?: never;
         };
         requestBody?: never;
         responses: {
-            /** @description A list object: { object, data, has_more, url }. */
+            /** @description A page of results, newest first. */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["PublicWalletTransactionDto"][];
+                    "application/json": {
+                        /** @enum {string} */
+                        object: "list";
+                        data: components["schemas"]["PublicWalletTransactionDto"][];
+                        /** @description More results follow: pass the last id as starting_after. */
+                        has_more: boolean;
+                        /** @example /developer/api/v1/orders */
+                        url: string;
+                    };
                 };
             };
         };
@@ -1796,10 +1804,7 @@ export interface operations {
     developerRetrieveFundingAccount: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description POST only. A unique value (e.g. a UUID) so a retry within 24 hours replays the first response. */
-                "Idempotency-Key"?: string;
-            };
+            header?: never;
             path?: never;
             cookie?: never;
         };
@@ -1819,7 +1824,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description POST only. A unique value (e.g. a UUID) so a retry within 24 hours replays the first response. */
+                /** @description A unique value (e.g. a UUID) so a retry within 24 hours replays the first response. */
                 "Idempotency-Key"?: string;
             };
             path?: never;
@@ -1844,10 +1849,7 @@ export interface operations {
     developerListServiceAreas: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description POST only. A unique value (e.g. a UUID) so a retry within 24 hours replays the first response. */
-                "Idempotency-Key"?: string;
-            };
+            header?: never;
             path?: never;
             cookie?: never;
         };
@@ -1867,7 +1869,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description POST only. A unique value (e.g. a UUID) so a retry within 24 hours replays the first response. */
+                /** @description A unique value (e.g. a UUID) so a retry within 24 hours replays the first response. */
                 "Idempotency-Key"?: string;
             };
             path?: never;
@@ -1900,10 +1902,7 @@ export interface operations {
     developerRetrieveQuote: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description POST only. A unique value (e.g. a UUID) so a retry within 24 hours replays the first response. */
-                "Idempotency-Key"?: string;
-            };
+            header?: never;
             path: {
                 id: string;
             };
@@ -1928,10 +1927,7 @@ export interface operations {
                 lng: string;
                 service_area: string;
             };
-            header?: {
-                /** @description POST only. A unique value (e.g. a UUID) so a retry within 24 hours replays the first response. */
-                "Idempotency-Key"?: string;
-            };
+            header?: never;
             path?: never;
             cookie?: never;
         };
@@ -1962,22 +1958,27 @@ export interface operations {
                 /** @description created[gte] and/or created[lte]: ISO 8601 dates or Unix seconds. */
                 created?: Record<string, never>;
             };
-            header?: {
-                /** @description POST only. A unique value (e.g. a UUID) so a retry within 24 hours replays the first response. */
-                "Idempotency-Key"?: string;
-            };
+            header?: never;
             path?: never;
             cookie?: never;
         };
         requestBody?: never;
         responses: {
-            /** @description A list object: { object, data, has_more, url }. */
+            /** @description A page of results, newest first. */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["PublicOrderDto"][];
+                    "application/json": {
+                        /** @enum {string} */
+                        object: "list";
+                        data: components["schemas"]["PublicOrderDto"][];
+                        /** @description More results follow: pass the last id as starting_after. */
+                        has_more: boolean;
+                        /** @example /developer/api/v1/orders */
+                        url: string;
+                    };
                 };
             };
         };
@@ -1986,7 +1987,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description POST only. A unique value (e.g. a UUID) so a retry within 24 hours replays the first response. */
+                /** @description A unique value (e.g. a UUID) so a retry within 24 hours replays the first response. */
                 "Idempotency-Key"?: string;
             };
             path?: never;
@@ -2011,10 +2012,7 @@ export interface operations {
     developerRetrieveOrder: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description POST only. A unique value (e.g. a UUID) so a retry within 24 hours replays the first response. */
-                "Idempotency-Key"?: string;
-            };
+            header?: never;
             path: {
                 id: string;
             };
@@ -2036,7 +2034,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description POST only. A unique value (e.g. a UUID) so a retry within 24 hours replays the first response. */
+                /** @description A unique value (e.g. a UUID) so a retry within 24 hours replays the first response. */
                 "Idempotency-Key"?: string;
             };
             path: {
@@ -2065,7 +2063,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description POST only. A unique value (e.g. a UUID) so a retry within 24 hours replays the first response. */
+                /** @description A unique value (e.g. a UUID) so a retry within 24 hours replays the first response. */
                 "Idempotency-Key"?: string;
             };
             path: {
@@ -2093,7 +2091,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description POST only. A unique value (e.g. a UUID) so a retry within 24 hours replays the first response. */
+                /** @description A unique value (e.g. a UUID) so a retry within 24 hours replays the first response. */
                 "Idempotency-Key"?: string;
             };
             path: {
@@ -2116,10 +2114,7 @@ export interface operations {
     developerUpdateOrderStop: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description POST only. A unique value (e.g. a UUID) so a retry within 24 hours replays the first response. */
-                "Idempotency-Key"?: string;
-            };
+            header?: never;
             path: {
                 id: string;
                 stop_id: string;
@@ -2146,10 +2141,7 @@ export interface operations {
     developerListOrderOffers: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description POST only. A unique value (e.g. a UUID) so a retry within 24 hours replays the first response. */
-                "Idempotency-Key"?: string;
-            };
+            header?: never;
             path: {
                 id: string;
             };
@@ -2157,13 +2149,21 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description A list object: { object, data, has_more, url }. */
+            /** @description Every offer riders made on the order, oldest first. */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["PublicOfferDto"][];
+                    "application/json": {
+                        /** @enum {string} */
+                        object: "list";
+                        data: components["schemas"]["PublicOfferDto"][];
+                        /** @description More results follow: pass the last id as starting_after. */
+                        has_more: boolean;
+                        /** @example /developer/api/v1/orders */
+                        url: string;
+                    };
                 };
             };
         };
@@ -2172,7 +2172,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description POST only. A unique value (e.g. a UUID) so a retry within 24 hours replays the first response. */
+                /** @description A unique value (e.g. a UUID) so a retry within 24 hours replays the first response. */
                 "Idempotency-Key"?: string;
             };
             path: {
@@ -2198,7 +2198,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description POST only. A unique value (e.g. a UUID) so a retry within 24 hours replays the first response. */
+                /** @description A unique value (e.g. a UUID) so a retry within 24 hours replays the first response. */
                 "Idempotency-Key"?: string;
             };
             path: {
@@ -2223,10 +2223,7 @@ export interface operations {
     developerTrackOrder: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description POST only. A unique value (e.g. a UUID) so a retry within 24 hours replays the first response. */
-                "Idempotency-Key"?: string;
-            };
+            header?: never;
             path: {
                 id: string;
             };
@@ -2270,7 +2267,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description POST only. A unique value (e.g. a UUID) so a retry within 24 hours replays the first response. */
+                /** @description A unique value (e.g. a UUID) so a retry within 24 hours replays the first response. */
                 "Idempotency-Key"?: string;
             };
             path: {
@@ -2303,22 +2300,27 @@ export interface operations {
                 /** @description Id of the first object on the next page; returns the objects before it. */
                 ending_before?: string;
             };
-            header?: {
-                /** @description POST only. A unique value (e.g. a UUID) so a retry within 24 hours replays the first response. */
-                "Idempotency-Key"?: string;
-            };
+            header?: never;
             path?: never;
             cookie?: never;
         };
         requestBody?: never;
         responses: {
-            /** @description A list object: { object, data, has_more, url }. */
+            /** @description A page of results, newest first. */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["PublicWebhookEndpointDto"][];
+                    "application/json": {
+                        /** @enum {string} */
+                        object: "list";
+                        data: components["schemas"]["PublicWebhookEndpointDto"][];
+                        /** @description More results follow: pass the last id as starting_after. */
+                        has_more: boolean;
+                        /** @example /developer/api/v1/orders */
+                        url: string;
+                    };
                 };
             };
         };
@@ -2327,7 +2329,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description POST only. A unique value (e.g. a UUID) so a retry within 24 hours replays the first response. */
+                /** @description A unique value (e.g. a UUID) so a retry within 24 hours replays the first response. */
                 "Idempotency-Key"?: string;
             };
             path?: never;
@@ -2352,10 +2354,7 @@ export interface operations {
     developerRetrieveWebhookEndpoint: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description POST only. A unique value (e.g. a UUID) so a retry within 24 hours replays the first response. */
-                "Idempotency-Key"?: string;
-            };
+            header?: never;
             path: {
                 id: string;
             };
@@ -2376,10 +2375,7 @@ export interface operations {
     developerDeleteWebhookEndpoint: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description POST only. A unique value (e.g. a UUID) so a retry within 24 hours replays the first response. */
-                "Idempotency-Key"?: string;
-            };
+            header?: never;
             path: {
                 id: string;
             };
@@ -2399,10 +2395,7 @@ export interface operations {
     developerUpdateWebhookEndpoint: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description POST only. A unique value (e.g. a UUID) so a retry within 24 hours replays the first response. */
-                "Idempotency-Key"?: string;
-            };
+            header?: never;
             path: {
                 id: string;
             };
@@ -2428,7 +2421,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description POST only. A unique value (e.g. a UUID) so a retry within 24 hours replays the first response. */
+                /** @description A unique value (e.g. a UUID) so a retry within 24 hours replays the first response. */
                 "Idempotency-Key"?: string;
             };
             path: {
@@ -2452,7 +2445,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description POST only. A unique value (e.g. a UUID) so a retry within 24 hours replays the first response. */
+                /** @description A unique value (e.g. a UUID) so a retry within 24 hours replays the first response. */
                 "Idempotency-Key"?: string;
             };
             path: {
@@ -2485,22 +2478,27 @@ export interface operations {
                 /** @description created[gte] and/or created[lte]: ISO 8601 dates or Unix seconds. */
                 created?: Record<string, never>;
             };
-            header?: {
-                /** @description POST only. A unique value (e.g. a UUID) so a retry within 24 hours replays the first response. */
-                "Idempotency-Key"?: string;
-            };
+            header?: never;
             path?: never;
             cookie?: never;
         };
         requestBody?: never;
         responses: {
-            /** @description A list object: { object, data, has_more, url }. */
+            /** @description A page of results, newest first. */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["PublicEventDto"][];
+                    "application/json": {
+                        /** @enum {string} */
+                        object: "list";
+                        data: components["schemas"]["PublicEventDto"][];
+                        /** @description More results follow: pass the last id as starting_after. */
+                        has_more: boolean;
+                        /** @example /developer/api/v1/orders */
+                        url: string;
+                    };
                 };
             };
         };
@@ -2508,10 +2506,7 @@ export interface operations {
     developerRetrieveEvent: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description POST only. A unique value (e.g. a UUID) so a retry within 24 hours replays the first response. */
-                "Idempotency-Key"?: string;
-            };
+            header?: never;
             path: {
                 id: string;
             };
@@ -2533,7 +2528,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description POST only. A unique value (e.g. a UUID) so a retry within 24 hours replays the first response. */
+                /** @description A unique value (e.g. a UUID) so a retry within 24 hours replays the first response. */
                 "Idempotency-Key"?: string;
             };
             path: {
@@ -2560,10 +2555,7 @@ export interface operations {
     developerListOrderEvents: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description POST only. A unique value (e.g. a UUID) so a retry within 24 hours replays the first response. */
-                "Idempotency-Key"?: string;
-            };
+            header?: never;
             path: {
                 id: string;
             };
@@ -2571,13 +2563,21 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description A list object, oldest first. */
+            /** @description Every event about the order, oldest first. */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["PublicEventDto"][];
+                    "application/json": {
+                        /** @enum {string} */
+                        object: "list";
+                        data: components["schemas"]["PublicEventDto"][];
+                        /** @description More results follow: pass the last id as starting_after. */
+                        has_more: boolean;
+                        /** @example /developer/api/v1/orders */
+                        url: string;
+                    };
                 };
             };
         };
