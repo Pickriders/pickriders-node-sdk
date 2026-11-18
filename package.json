@@ -1,6 +1,6 @@
 {
   "name": "pickriders",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "The official Pickriders SDK: book deliveries and follow them to the door, in TypeScript or JavaScript, on the server and in the browser.",
   "keywords": [
     "pickriders",
