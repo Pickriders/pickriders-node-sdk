@@ -17,6 +17,8 @@ const delivered = await pickriders.orders.track(order).done();
 - **Runs where your code runs.** Node.js 20+, Bun, Deno, Next.js, Cloudflare Workers, and in the browser through `pickriders/client`, which needs no secret key.
 - **No dependencies.** Nothing to audit but this package.
 
+**Guides, a full tutorial and the reference are in the docs: [developers.pickriders.com/docs/sdks](https://developers.pickriders.com/docs/sdks).** Start with [Build a food delivery app](https://developers.pickriders.com/docs/tutorials/food-delivery).
+
 ## Install
 
 ```sh
@@ -153,16 +155,37 @@ const delivery = trackDelivery(trackingUrl);
 delivery.on('status', (status) => render(status));
 ```
 
-Trackers are stores: `subscribe` and `getSnapshot` plug straight into React, Vue and Svelte.
+Trackers are stores: `subscribe` and `getSnapshot` plug straight into React's `useSyncExternalStore`. Start the tracker in an effect, so each mount gets its own and Strict Mode's double mount doesn't stop it:
 
 ```tsx
+'use client';
 import { useEffect, useState, useSyncExternalStore } from 'react';
-import { trackDelivery } from 'pickriders/client';
+import { trackDelivery, type DeliveryTracker, type PublicTracking, type TrackerState } from 'pickriders/client';
 
-function useDelivery(trackingUrl: string) {
-  const [delivery] = useState(() => trackDelivery(trackingUrl));
-  useEffect(() => () => delivery.stop(), [delivery]);
-  return useSyncExternalStore(delivery.subscribe, delivery.getSnapshot);
+const IDLE: TrackerState<PublicTracking> = {
+  data: undefined,
+  status: undefined,
+  done: false,
+  error: undefined,
+  source: undefined,
+  updatedAt: undefined,
+  stopped: false,
+};
+const noSubscription = () => () => {};
+
+export function useDelivery(trackingUrl: string | null | undefined) {
+  const [tracker, setTracker] = useState<DeliveryTracker | null>(null);
+  useEffect(() => {
+    if (!trackingUrl) return setTracker(null);
+    const delivery = trackDelivery(trackingUrl);
+    setTracker(delivery);
+    return () => delivery.stop();
+  }, [trackingUrl]);
+  return useSyncExternalStore(
+    tracker ? tracker.subscribe : noSubscription,
+    tracker ? tracker.getSnapshot : () => IDLE,
+    () => IDLE,
+  );
 }
 
 function DeliveryStatus({ trackingUrl }: { trackingUrl: string }) {
@@ -170,7 +193,7 @@ function DeliveryStatus({ trackingUrl }: { trackingUrl: string }) {
   if (!data) return <p>Loading…</p>;
   return (
     <p>
-      {data.status.replace('_', ' ')}
+      {data.status.replaceAll('_', ' ')}
       {data.rider && ` · ${data.rider.name}`}
       {data.eta_s ? ` · about ${Math.ceil(data.eta_s / 60)} min` : null}
       {error && ' (reconnecting)'}
@@ -178,6 +201,8 @@ function DeliveryStatus({ trackingUrl }: { trackingUrl: string }) {
   );
 }
 ```
+
+Vue wraps it in a composable, and Svelte in a `readable` store (Svelte stores must call back at once, so a two-line wrapper does it). Both are in the guides: [React](https://developers.pickriders.com/docs/sdks/react), [Vue and Nuxt](https://developers.pickriders.com/docs/sdks/vue), [Svelte and SvelteKit](https://developers.pickriders.com/docs/sdks/svelte).
 
 `getSnapshot()` returns `{ data, status, done, error, source, updatedAt, stopped }`, a new object only when something changed.
 
