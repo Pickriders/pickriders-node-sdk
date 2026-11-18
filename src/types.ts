@@ -17,7 +17,7 @@ export type OrderStatus = Schemas['PublicOrderDto']['status'];
 export type OrderType = Schemas['PublicOrderDto']['type'];
 export type StopStatus = Schemas['OrderStopDto']['status'];
 
-export type Order = Override<Schemas['PublicOrderDto'], { object: 'order'; metadata: Metadata }>;
+export type Order = Override<Schemas['PublicOrderDto'], { object: 'order' }>;
 export type OrderStop = Schemas['OrderStopDto'];
 export type OrderRider = Schemas['OrderRiderDto'];
 export type OrderPricing = Schemas['OrderPricingDto'];
@@ -47,7 +47,7 @@ export type StopInput = Schemas['StopInputDto'];
 export type CreateQuoteParams = Schemas['CreateQuoteRequestDto'];
 export type OrderPricingParams = Schemas['OrderPricingRequestDto'];
 export type TestOptions = Schemas['TestOptionsDto'];
-export type RawCreateOrderParams = Override<Schemas['CreateOrderRequestDto'], { metadata?: Metadata }>;
+export type RawCreateOrderParams = Schemas['CreateOrderRequestDto'];
 
 /**
  * Create an order the short way: name the `pickup` and the `dropoff`, and the SDK works out the
