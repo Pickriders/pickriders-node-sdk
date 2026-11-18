@@ -20,9 +20,12 @@ jobs:
         with:
           node-version: 22
           cache: yarn
-          registry-url: https://registry.npmjs.org
+          # No registry-url: it writes an .npmrc with ${NODE_AUTH_TOKEN}, which Yarn 1 can't start
+          # without (setup-node runs `yarn cache dir` for the cache). changesets/action writes its own
+          # .npmrc from NPM_TOKEN just before publishing.
       - run: yarn install --frozen-lockfile
-      # Opens a "Version packages" PR from pending changesets; merging it publishes to npm.
+      # With pending changesets: opens a "Version packages" PR, and merging that publishes.
+      # With none: publishes any version not on npm yet (0.1.0 on the first run).
       - uses: changesets/action@v1
         with:
           version: yarn changeset version
@@ -32,4 +35,3 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
